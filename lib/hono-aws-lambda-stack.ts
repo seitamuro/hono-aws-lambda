@@ -20,5 +20,18 @@ export class HonoAwsLambdaStack extends cdk.Stack {
     new apigw.LambdaRestApi(this, "HonoApi", {
       handler: fn,
     });
+
+    const streaming_fn = new NodejsFunction(this, "HonoStreamingFunction", {
+      entry: "lambda/streaming.ts",
+      handler: "handler",
+      runtime: lambda.Runtime.NODEJS_20_X,
+    });
+    const streaming_url = streaming_fn.addFunctionUrl({
+      authType: lambda.FunctionUrlAuthType.NONE,
+      invokeMode: lambda.InvokeMode.RESPONSE_STREAM,
+    });
+    new cdk.CfnOutput(this, "StreamingUrl", {
+      value: streaming_url.url,
+    });
   }
 }
